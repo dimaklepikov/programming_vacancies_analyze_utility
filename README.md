@@ -27,7 +27,7 @@ $ pip install -r requirements.txt
 
 4. Запустить файл main.py
 ```sh
-$ python3 run path/manage.py
+$ python3 run path/main.py
 ```
 
 ## Цель проекта:
