@@ -1,15 +1,13 @@
-import numpy
 import requests
 import os
+import numpy
 
-
-SUPERJOB_URL_TEMPLATE = 'https://api.superjob.ru/2.0/{}'
-API_KEY_SJ = os.getenv('sj_secret_key')
+SUPERJOB_URL_TEMPLATE = 'https://api.superjob.ru/2.0/{}/'
 
 
 def get_superjob_vacancies(vacancy, page=0):
     all_pages = []
-    headers = {'X-Api-App-Id': API_KEY_SJ}
+    headers = {'X-Api-App-Id': os.getenv('sj_secret_key')}
     params = {'keyword': vacancy, 'town': 4, 'catalogues': 48, 'page': page}
     response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
     response.raise_for_status()
@@ -38,14 +36,18 @@ def predict_rub_salary_for_SuperJob(vacancy):
     return salaries_average
 
 
-languages_list = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
-stats_list_sj = []
-for language in languages_list:
-    language_vacancies_amount_sj = {
-        language: {'vacancies_found': get_superjob_vacancies('{} программист'.format(language))[0]['total'],
-                   'vacancies_processed': len(predict_rub_salary_for_SuperJob('{} программист'.format(language))),
-                   'average_salary': int(
-                       numpy.mean(predict_rub_salary_for_SuperJob('{} программист'.format(language)))),
-                   }
-    }
-    stats_list_sj.append(language_vacancies_amount_sj)
+def get_stats():
+    languages_list = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
+    stats_list = []
+    for language in languages_list:
+        language_vacancies_amount_sj = {
+            language: {
+                'vacancies_found': get_superjob_vacancies('{} программист'.format(language))[0]['total'],
+                'vacancies_processed': len(
+                    predict_rub_salary_for_SuperJob('{} программист'.format(language))),
+                'average_salary': int(
+                    numpy.mean(predict_rub_salary_for_SuperJob('{} программист'.format(language)))),
+                }
+        }
+        stats_list.append(language_vacancies_amount_sj)
+    return stats_list

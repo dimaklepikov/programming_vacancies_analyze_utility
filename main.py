@@ -2,6 +2,7 @@ import hh
 import sj
 from terminaltables import AsciiTable
 from dotenv import load_dotenv
+import os
 
 
 def print_table(lst, title):
@@ -19,5 +20,5 @@ def print_table(lst, title):
 
 if __name__ == "__main__":
     load_dotenv()
-    print_table(sj.stats_list_sj, 'SuperJob Moscow')
-    print_table(hh.stats_list_hh, 'HeadHunter Moscow')
+    print_table(sj.get_stats(), 'SuperJob Moscow')
+    print_table(hh.get_stats(), 'HeadHunter Moscow')
