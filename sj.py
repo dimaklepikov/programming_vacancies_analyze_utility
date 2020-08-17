@@ -13,7 +13,8 @@ def get_superjob_vacancies(vacancy, page=0):
     response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
     response.raise_for_status()
     sj_response = response.json()
-    all_pages.append(sj_response)
+    if sj_response['more'] is False:
+        all_pages.append(sj_response)
     while sj_response['more'] is True:
         params = {'keyword': vacancy, 'town': 4, 'catalogues': 48, 'page': page}
         response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
