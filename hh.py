@@ -49,7 +49,7 @@ def get_stats():
     for language in languages_list:
         language_vacancies_amount_hh = {
             language: {'vacancies_found': get_vacancies('{} программист'.format(language))[0]['found'],
-                       'vacancies_processed': len(get_vacancies('{} программист'.format(language))),
+                       'vacancies_processed': len(predict_rub_salary('{} программист'.format(language))),
                        'average_salary': int(
                            numpy.mean(predict_rub_salary('{} программист'.format(language))[0])),
                        }
