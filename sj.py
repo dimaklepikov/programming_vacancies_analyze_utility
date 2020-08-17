@@ -1,6 +1,7 @@
 import requests
 import os
 import numpy
+from hh import get_salaries_average
 
 SUPERJOB_URL_TEMPLATE = 'https://api.superjob.ru/2.0/{}/'
 
@@ -11,34 +12,34 @@ def get_superjob_vacancies(vacancy, page=0):
     params = {'keyword': vacancy, 'town': 4, 'catalogues': 48, 'page': page}
     response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
     response.raise_for_status()
-    all_pages.append(response.json())
-    while response.json()['more'] is True:
+    sj_response = response.json()
+    all_pages.append(sj_response)
+    while sj_response['more'] is True:
         params = {'keyword': vacancy, 'town': 4, 'catalogues': 48, 'page': page}
         response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
         response.raise_for_status()
-        all_pages.append(response.json())
+        sj_response = response.json()
+        all_pages.append(sj_response)
         page += 1
     return all_pages
 
 
 def predict_rub_salary_for_SuperJob(vacancy):
-    salaries_average = []
+    salary = []
     for all_vac in get_superjob_vacancies(vacancy):
         for objects in all_vac['objects']:
-            if objects['payment_from'] == 0 and objects['payment_to'] == 0:
+            if get_salaries_average(objects['payment_from'], objects['payment_to']) == 0:
                 continue
-            if objects['payment_from'] == 0:
-                salaries_average.append(objects['payment_to'] * 1.2)
-            if objects['payment_to'] == 0:
-                salaries_average.append(objects['payment_from'] * 0.8)
-            if objects['payment_from'] and objects['payment_to'] is int:
-                salaries_average.append((objects['payment_from'] + objects['payment_to']) / 2)
-    return salaries_average
+            if get_salaries_average(objects['payment_from'], objects['payment_to']) is None:
+                continue
+            else:
+                salary.append(get_salaries_average(objects['payment_from'], objects['payment_to']))
+    return salary
 
 
 def get_stats():
     languages_list = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
-    stats_list = []
+    stats = []
     for language in languages_list:
         language_vacancies_amount_sj = {
             language: {
@@ -47,7 +48,7 @@ def get_stats():
                     predict_rub_salary_for_SuperJob('{} программист'.format(language))),
                 'average_salary': int(
                     numpy.mean(predict_rub_salary_for_SuperJob('{} программист'.format(language)))),
-                }
+            }
         }
-        stats_list.append(language_vacancies_amount_sj)
-    return stats_list
+        stats.append(language_vacancies_amount_sj)
+    return stats

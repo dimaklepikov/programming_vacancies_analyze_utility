@@ -2,19 +2,18 @@ import hh
 import sj
 from terminaltables import AsciiTable
 from dotenv import load_dotenv
-import os
 
 
-def print_table(lst, title):
-    table_data = []
+def print_table(body, title):
+    table_content = []
     titles = ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
-    table_data.append(titles)
-    for stats in lst:
+    table_content.append(titles)
+    for stats in body:
         for lang in stats:
             values = [lang, stats[lang]['vacancies_found'], stats[lang]['vacancies_processed'],
                       stats[lang]['average_salary']]
-            table_data.append(values)
-    table = AsciiTable(table_data, title)
+            table_content.append(values)
+    table = AsciiTable(table_content, title)
     return print(table.table)
 
 
