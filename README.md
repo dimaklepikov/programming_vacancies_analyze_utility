@@ -1,4 +1,4 @@
-# Сравниваем вакансии программистов
+#Сравниваем вакансии программистов
 
 Утилита, позволяющая проанализировать колличество вакансий по 10 языкам программирования, согласно рейтингу [GitHub](https://habr.com/ru/post/310262/)
 , опубликованных за последний месяц, а так же средненюю зарплату по ним
@@ -24,10 +24,16 @@ $ source vacancies_analyze/bin/activate
 ```sh
 $ pip install -r requirements.txt
 ```
+4. В папке проекта создать файл с переменными окружения [.env](https://pypi.org/project/python-dotenv/):
+   - Получить [SuperJob secret key](https://api.superjob.ru/register)
+   - Создать в файле переменную с названием SJ_SECRET_KEY:
+        ```sh
+        SJ_SECRET_KEY=v3.r.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        ```
 
-4. Запустить файл main.py
+5. Запустить файл main.py
 ```sh
-$ python3 run path/main.py
+$ python3 path/main.py
 ```
 
 ## Цель проекта:
