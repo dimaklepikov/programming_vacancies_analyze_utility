@@ -1,6 +1,7 @@
 import requests
 import numpy
 from itertools import count
+from utils import get_salaries_average
 
 HH_URL_TEMPLATE = 'https://api.hh.ru/{}/'
 MAXIMAL_PAGE = 98
@@ -17,15 +18,6 @@ def get_vacancies(profession):
         if page == hh_response['pages'] or page > MAXIMAL_PAGE:
             break
     return all_pages
-
-
-def get_salaries_average(salary_from, salary_to):
-    if salary_from == 0 or salary_from is None:
-        return salary_to * 1.2
-    if salary_to == 0 or salary_to is None:
-        return salary_from * 0.8
-    if salary_from is not None and salary_to is not None:
-        return (salary_from + salary_to) / 2
 
 
 def predict_rub_salary(vacancy):
