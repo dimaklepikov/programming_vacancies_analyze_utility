@@ -1,21 +1,27 @@
 import requests
 import os
 import numpy
-from hh import get_salaries_average
+from utils import get_salaries_average
 
 SUPERJOB_URL_TEMPLATE = 'https://api.superjob.ru/2.0/{}/'
 
 
-def get_superjob_vacancies(vacancy, page=0):
-    all_pages = []
-    headers = {'X-Api-App-Id': os.getenv('sj_secret_key')}
-    params = {'keyword': vacancy, 'town': 4, 'catalogues': 48, 'page': page}
+def get_sj_vacancy(vacancy, api_key):
+    headers = {'X-Api-App-Id': api_key}
+    params = {'keyword': vacancy, 'town': 4, 'catalogues': 48}
     response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
     response.raise_for_status()
     sj_response = response.json()
-    if sj_response['more'] is False:
+    return sj_response
+
+
+def get_sj_vacanccies(vacancy, api_key, page=0):
+    all_pages = []
+    sj_response = get_sj_vacancy(vacancy, os.getenv('sj_secret_key'))
+    if not sj_response['more']:
         all_pages.append(sj_response)
-    while sj_response['more'] is True:
+    while sj_response['more']:
+        headers = {'X-Api-App-Id': api_key}
         params = {'keyword': vacancy, 'town': 4, 'catalogues': 48, 'page': page}
         response = requests.get(SUPERJOB_URL_TEMPLATE.format('vacancies'), headers=headers, params=params)
         response.raise_for_status()
@@ -26,25 +32,26 @@ def get_superjob_vacancies(vacancy, page=0):
 
 
 def predict_rub_salary_for_SuperJob(vacancy):
-    salary = []
-    for all_vac in get_superjob_vacancies(vacancy):
+    salaries = []
+    for all_vac in get_sj_vacanccies(vacancy, os.getenv('sj_secret_key')):
         for objects in all_vac['objects']:
-            if get_salaries_average(objects['payment_from'], objects['payment_to']) == 0:
+            payment = get_salaries_average(objects['payment_from'], objects['payment_to'])
+            if payment == 0:
                 continue
-            if get_salaries_average(objects['payment_from'], objects['payment_to']) is None:
+            if payment is None:
                 continue
             else:
-                salary.append(get_salaries_average(objects['payment_from'], objects['payment_to']))
-    return salary
+                salaries.append(payment)
+    return salaries
 
 
 def get_stats():
-    languages_list = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
+    programming_languages = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
     stats = []
-    for language in languages_list:
+    for language in programming_languages:
         language_vacancies_amount_sj = {
             language: {
-                'vacancies_found': get_superjob_vacancies('{} программист'.format(language))[0]['total'],
+                'vacancies_found': get_sj_vacanccies('{} программист'.format(language), os.getenv('sj_secret_key'))[0]['total'],
                 'vacancies_processed': len(
                     predict_rub_salary_for_SuperJob('{} программист'.format(language))),
                 'average_salary': int(
