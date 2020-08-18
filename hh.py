@@ -21,7 +21,7 @@ def get_vacancies(profession):
 
 
 def predict_rub_salary(vacancy):
-    salary = []
+    salaries = []
     for all_pages in get_vacancies(vacancy):
         for items in all_pages['items']:
             if items['salary'] is None:
@@ -31,8 +31,8 @@ def predict_rub_salary(vacancy):
             if get_salaries_average(items['salary']['from'], items['salary']['to']) is None:
                 continue
             else:
-                salary.append(get_salaries_average(items['salary']['to'], items['salary']['from']))
-    return salary
+                salaries.append(get_salaries_average(items['salary']['to'], items['salary']['from']))
+    return salaries
 
 
 def get_stats():
