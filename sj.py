@@ -31,9 +31,9 @@ def get_sj_vacancies(vacancy, api_key, page=0):
     return all_pages
 
 
-def predict_rub_salary_for_SuperJob(vacancy):
+def predict_rub_salary_for_SuperJob(vacancy, api_key):
     salaries = []
-    sj_fetched_vacancies = get_sj_vacancies(vacancy, os.getenv('SJ_SECRET_KEY'))
+    sj_fetched_vacancies = get_sj_vacancies(vacancy, api_key)
     for all_vac in sj_fetched_vacancies:
         for objects in all_vac['objects']:
             payment = get_salaries_average(objects['payment_from'], objects['payment_to'])
@@ -53,11 +53,12 @@ def get_stats():
         language_vacancies_amount_sj = {
             language: {
                 'vacancies_found': get_sj_vacancies('{} программист'.format(language),
-                                                    os.getenv('sj_secret_key'))[0]['total'],
+                                                    os.getenv('SJ_SECRET_KEY'))[0]['total'],
                 'vacancies_processed': len(
-                    predict_rub_salary_for_SuperJob('{} программист'.format(language))),
+                    predict_rub_salary_for_SuperJob('{} программист'.format(language), os.getenv('SJ_SECRET_KEY'))),
                 'average_salary': int(
-                    numpy.mean(predict_rub_salary_for_SuperJob('{} программист'.format(language)))),
+                    numpy.mean(predict_rub_salary_for_SuperJob('{} программист'.format(language),
+                                                               os.getenv('SJ_SECRET_KEY')))),
             }
         }
         stats.append(language_vacancies_amount_sj)
