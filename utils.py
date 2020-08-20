@@ -1,5 +1,7 @@
 from terminaltables import AsciiTable
 
+programming_languages = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
+
 
 def get_salaries_average(salary_from, salary_to):
     if salary_from == 0 or salary_from is None:
