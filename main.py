@@ -1,3 +1,4 @@
+import os
 import hh
 import sj
 from dotenv import load_dotenv
@@ -6,5 +7,12 @@ from utils import print_table
 
 if __name__ == "__main__":
     load_dotenv()
-    print_table(sj.get_stats(), 'SuperJob Moscow')
-    print_table(hh.get_stats(), 'HeadHunter Moscow')
+    KEY = os.getenv('SJ_SECRET_KEY')
+    programming_languages = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
+    table_content_sj = []
+    table_content_hh = []
+    for language in programming_languages:
+        table_content_sj.append(sj.get_stats(language, KEY))
+        table_content_hh.append(hh.get_stats(language))
+    print_table(table_content_sj, 'Superjob Moscow')
+    print_table(table_content_hh, 'HeadHunter Moscow')

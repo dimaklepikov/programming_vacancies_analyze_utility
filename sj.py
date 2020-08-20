@@ -31,9 +31,8 @@ def get_sj_vacancies(vacancy, api_key, page=0):
     return all_pages
 
 
-def predict_rub_salary_for_SuperJob(vacancy, api_key):
+def predict_rub_salary_for_SuperJob(sj_fetched_vacancies):
     salaries = []
-    sj_fetched_vacancies = get_sj_vacancies(vacancy, api_key)
     for all_vac in sj_fetched_vacancies:
         for objects in all_vac['objects']:
             payment = get_salaries_average(objects['payment_from'], objects['payment_to'])
@@ -46,20 +45,16 @@ def predict_rub_salary_for_SuperJob(vacancy, api_key):
     return salaries
 
 
-def get_stats():
-    programming_languages = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
-    stats = []
-    for language in programming_languages:
-        language_vacancies_amount_sj = {
-            language: {
-                'vacancies_found': get_sj_vacancies('{} программист'.format(language),
-                                                    os.getenv('SJ_SECRET_KEY'))[0]['total'],
-                'vacancies_processed': len(
-                    predict_rub_salary_for_SuperJob('{} программист'.format(language), os.getenv('SJ_SECRET_KEY'))),
-                'average_salary': int(
-                    numpy.mean(predict_rub_salary_for_SuperJob('{} программист'.format(language),
-                                                               os.getenv('SJ_SECRET_KEY')))),
-            }
+def get_stats(language, api_key):
+    all_pages_response = get_sj_vacancies('{} программист'.format(language),
+                                          api_key)
+    language_vacancies_amount_sj = {
+        language: {
+            'vacancies_found': all_pages_response[0]['total'],
+            'vacancies_processed': len(
+                predict_rub_salary_for_SuperJob(all_pages_response)),
+            'average_salary': int(
+                numpy.mean(predict_rub_salary_for_SuperJob(all_pages_response)))
         }
-        stats.append(language_vacancies_amount_sj)
-    return stats
+    }
+    return language_vacancies_amount_sj

@@ -20,9 +20,9 @@ def get_vacancies(profession):
     return all_pages
 
 
-def predict_rub_salary(vacancy):
+def predict_rub_salary(hh_fetched_vacancies):
     salaries = []
-    for all_pages in get_vacancies(vacancy):
+    for all_pages in hh_fetched_vacancies:
         for items in all_pages['items']:
             if items['salary'] is None:
                 continue
@@ -35,16 +35,13 @@ def predict_rub_salary(vacancy):
     return salaries
 
 
-def get_stats():
-    languages_list = ['Go', 'C', 'C#', 'CSS', 'C++', 'PHP', 'Ruby', 'Python', 'Java', 'JavaScript']
-    stats = []
-    for language in languages_list:
-        language_vacancies_amount_hh = {
-            language: {'vacancies_found': get_vacancies('{} программист'.format(language))[0]['found'],
-                       'vacancies_processed': len(predict_rub_salary('{} программист'.format(language))),
-                       'average_salary': int(
-                           numpy.mean(predict_rub_salary('{} программист'.format(language))[0])),
-                       }
-        }
-        stats.append(language_vacancies_amount_hh)
-    return stats
+def get_stats(language):
+    all_pages_response = get_vacancies('{} программист'.format(language))
+    language_vacancies_amount_hh = {
+        language: {'vacancies_found': all_pages_response[0]['found'],
+                   'vacancies_processed': len(predict_rub_salary(all_pages_response)),
+                   'average_salary': int(
+                       numpy.mean(predict_rub_salary(all_pages_response)[0])),
+                   }
+    }
+    return language_vacancies_amount_hh
